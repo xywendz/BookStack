@@ -17,15 +17,6 @@ import (
 func main() {
 	// https://beego.me/docs/mvc/controller/config.md#app-%E9%85%8D%E7%BD%AE
 	beego.BConfig.MaxMemory = 1 << 26 * 1024 // 设置最大内存，64GB
-	if len(os.Args) >= 3 && os.Args[1] == "service" {
-		if os.Args[2] == "install" {
-			daemon.Install()
-		} else if os.Args[2] == "remove" {
-			daemon.Uninstall()
-		} else if os.Args[2] == "restart" {
-			daemon.Restart()
-		}
-	}
 	commands.RegisterCommand()
 
 	d := daemon.NewDaemon()
