@@ -36,6 +36,6 @@ COPY dictionary ./dictionary
 COPY static ./static
 COPY views ./views
 
-RUN ./bookstack install
+#RUN ./bookstack install
 
 CMD ["./bookstack"]
