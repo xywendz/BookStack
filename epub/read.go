@@ -54,46 +54,68 @@ func (p *Book) ReadAll() ([][]string, error) {
 	if p == nil {
 		return nil, errors.New("nil pointer receiver")
 	}
-
-	var contents [][]string
-	readFiles := make(map[string]bool)
-	var readAll func(points []NavPoint) error
-	readAll = func(points []NavPoint) error {
-		for _, point := range points {
-			if point.Content.Src != "" {
-				src := point.Content.Src
-				if strings.Contains(src, "#") {
-					parts := strings.Split(src, "#")
-					if len(parts) != 2 {
-						return errors.New("路径不止一个锚点:" + src)
-					}
-					src = parts[0]
-				}
-				if readFiles[src] {
-					continue
-				}
-				readFiles[src] = true
-				var ch []string
-				ch = append(ch, point.Text)
-				chapter, err := p.readFile(src)
-				if err != nil {
-					return err
-				}
-				ch = append(ch, chapter)
-				contents = append(contents, ch)
+	tocMap := make(map[string]string)
+	for _, point := range p.Ncx.Points {
+		pp := point.Points
+		ch := point.Text
+		if len(pp) > 0 {
+			for _, p := range pp {
+				tocMap[p.Content.Src] = ch + "_" + p.Text
 			}
-			if len(point.Points) > 0 {
-				if err := readAll(point.Points); err != nil {
-					return err
-				}
-			}
+		} else {
+			tocMap[point.Content.Src] = ch
 		}
+	}
+
+	itemMap := make(map[string]string)
+	for _, manifest := range p.Opf.Manifest {
+		itemMap[manifest.ID] = manifest.Href
+	}
+
+	var results [][]string
+	var readAll func(spineItem []SpineItem) error
+	readAll = func(spineItem []SpineItem) error {
+		var ch string
+		var content string
+		for _, item := range spineItem {
+			id := item.IDref
+			src := itemMap[id]
+			data, err := p.readFile(src)
+			if err != nil {
+				return err
+			}
+			if ch == "" { //第一章节
+				ch = tocMap[src]
+			}
+			var curCh string
+			if tocMap[src] == "" {
+				curCh = ch
+			} else {
+				curCh = tocMap[src]
+			}
+
+			if curCh != ch { //新的章节
+				var chData []string
+				chData = append(chData, ch)
+				chData = append(chData, content)
+				results = append(results, chData)
+				content = data
+				ch = tocMap[src]
+			} else {
+				content = content + data
+			}
+
+		}
+		var chData []string
+		chData = append(chData, ch)
+		chData = append(chData, content)
+		results = append(results, chData)
 		return nil
 	}
 
-	if err := readAll(p.Ncx.Points); err != nil {
+	if err := readAll(p.Opf.Spine.Items); err != nil {
 		return nil, err
 	}
 
-	return contents, nil
+	return results, nil
 }

@@ -16,8 +16,8 @@ import (
 func TestImportEpub(t *testing.T) {
 	commands.ConfigurationFile = "../conf/app.conf"
 	commands.ResolveCommand(os.Args)
-	bookName := "从零开始读懂经济学、金融学、投资理财学"
-	bookPath := "C:\\Users\\Administrator.DESKTOP-O1GNEVF\\Downloads\\《从零开始读懂经济学、金融学、投资理财学》\\从零开始读懂经济学、金融学、投资理财学.epub"
+	bookName := "三体-刘慈欣"
+	bookPath := "C:\\Users\\Administrator.DESKTOP-O1GNEVF\\OneDrive\\电子书\\小说\\三体-刘慈欣.epub"
 	bk, err := Open(bookPath)
 	if err != nil {
 		t.Fatal(err)
@@ -30,7 +30,7 @@ func TestImportEpub(t *testing.T) {
 	book := models.NewBook()
 	book.BookName = bookName
 	book.ParentId = 0
-	book.Identify = "jinrong-jingji"
+	book.Identify = "santi-liucixin"
 	book.Author = "管理员"
 	book.PrivatelyOwned = 1
 	book.MemberId = 1
@@ -40,9 +40,7 @@ func TestImportEpub(t *testing.T) {
 	book.ReleaseTime = time.Now()
 	book.GenerateTime = time.Now()
 	book.LastClickGenerate = time.Now()
-
 	book.Insert()
-
 	bookResult, err := models.NewBookResult().FindByIdentify(book.Identify, 1)
 	if err != nil {
 		t.Fatal(err)
@@ -76,13 +74,13 @@ func TestImportEpub(t *testing.T) {
 func TestImportBookDir(t *testing.T) {
 	commands.ConfigurationFile = "../conf/app.conf"
 	commands.ResolveCommand(os.Args)
-	bookName := "A-B测试从0到1"
-	bookPath := "C:\\workspace\\geektime-docs\\AI-大数据\\A-B测试从0到1\\docs"
+	bookName := "白话法律42讲"
+	bookPath := "C:\\workspace\\geektime-docs\\计算机基础\\白话法律42讲\\docs"
 
 	book := models.NewBook()
 	book.BookName = bookName
 	book.ParentId = 0
-	book.Identify = "ai-test-0-1"
+	book.Identify = "baihua-falv"
 	book.Author = "管理员"
 	book.PrivatelyOwned = 1
 	book.MemberId = 1
@@ -124,8 +122,8 @@ func TestImportBookDir(t *testing.T) {
 }
 
 func TestToMarkdown(t *testing.T) {
-	name := "2"
-	bk, err := Open("C:\\Users\\Administrator.DESKTOP-O1GNEVF\\Downloads\\2.epub")
+	name := "长安十二时辰（上下册）-马伯庸"
+	bk, err := Open("C:\\Users\\Administrator.DESKTOP-O1GNEVF\\Downloads\\长安十二时辰（上下册）-马伯庸.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
